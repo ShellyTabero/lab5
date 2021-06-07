@@ -33,11 +33,28 @@ class RocchioClassifier:
 
         return sum([(vec1[i] - vec2[i])**2 for i in range(len(vec1))])**0.5
 
+    def l2_norm(self, vec):
+        return sum([(vec[i])**2 for i in range(len(vec))])**0.5
+
+    def scalar_multiply(self, vec1, vec2):
+        return sum([(vec1[i] * vec2[i]) for i in range(len(vec1))])
+
     def predict(self, vector):
         winner_class = -1
         lowest_distance = sys.float_info.max
         for class_name, class_vector in self.class_centroids.items():
             distance = self.euclidean_dist(vector, class_vector)
+            if distance < lowest_distance:
+                winner_class = class_name
+                lowest_distance = distance
+
+        return winner_class
+
+    def predict_with_cosine(self, vector):
+        winner_class = -1
+        lowest_distance = sys.float_info.max
+        for class_name, class_vector in self.class_centroids.items():
+            distance = self.scalar_multiply(vector, class_vector) / (self.l2_norm(vector) * self.l2_norm(class_vector))
             if distance < lowest_distance:
                 winner_class = class_name
                 lowest_distance = distance
