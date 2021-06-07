@@ -8,6 +8,7 @@ class FileReader:
         self.words = {}
         self.df = {}
         self.stop_words = []
+        self.num_doc = 0
         self.create_stop_words_list()
         self.create_words_bank()
         self.inv_words = {v: k for k, v in self.words.items()}
@@ -37,6 +38,7 @@ class FileReader:
         with open(self.file, 'r') as reader: # open the file "file"
             for line in reader: # for each line in file
                 seen_in_this_line = []
+                self.num_doc += 1
                 for word in line.split("\t")[0].split(): # for each word in the line
                     word = self.pre_process_word(word)
                     if word == '':
@@ -83,6 +85,7 @@ class FileReader:
                         continue
                     vec[self.words[word]] += 1
                 doc_class = line.split("\t")[1].rstrip()
+
                 self.to_tf(vec)
                 vec.append(doc_class)
                 doc_set['doc' + str(index)] = vec
@@ -93,8 +96,31 @@ class FileReader:
     def to_tf(self, vec):
         for i, words_num in enumerate(vec):
             if words_num != 0:
-              vec[i] = 1+math.log10(words_num)
+              vec[i] = 1 + math.log10(words_num)
 
     def build_set_tfidf(self, file_to_vector):
-        # TODO: replace with your code
-        return self.build_set_boolean(file_to_vector)
+        doc_set = {}
+        reg_representation = {}
+        index = 0
+        with open(file_to_vector, 'r') as reader:
+            for line in reader:
+                vec = len(self.words) * [0, ]
+                for i, word in enumerate(line.split("\t")[0].split()):
+                    word = self.pre_process_word(word)
+                    if word == '':
+                        continue
+                    vec[self.words[word]] += 1
+                doc_class = line.split("\t")[1].rstrip()
+                self.to_tf_idf(vec)
+                vec.append(doc_class)
+                doc_set['doc' + str(index)] = vec
+                reg_representation['doc' + str(index)] = line.split("\t")[0]
+                index += 1
+        return doc_set, reg_representation
+
+    def to_tf_idf(self, vec):
+        for i, tf in enumerate(vec):
+            if vec[i] != 0:
+                vec[i] = tf * math.log10(self.num_doc / self.df[self.inv_words[i]])
+
+
