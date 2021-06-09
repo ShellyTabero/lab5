@@ -52,10 +52,10 @@ class RocchioClassifier:
 
     def predict_with_cosine(self, vector):
         winner_class = -1
-        lowest_distance = sys.float_info.max
+        lowest_distance = sys.float_info.min
         for class_name, class_vector in self.class_centroids.items():
             distance = self.scalar_multiply(vector, class_vector) / (self.l2_norm(vector) * self.l2_norm(class_vector))
-            if distance < lowest_distance:
+            if distance > lowest_distance:
                 winner_class = class_name
                 lowest_distance = distance
 

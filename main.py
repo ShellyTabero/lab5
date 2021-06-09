@@ -12,7 +12,7 @@ def calc_accuracy(test_set, classifier):
             correct += 1.0
     return correct/total
 
-def calc_accuracy1(test_set, classifier):
+def calc_accuracy_with_cosine(test_set, classifier):
     correct = 0.0
     total = len(test_set.keys())
     for key in test_set:
@@ -43,4 +43,9 @@ if __name__ == '__main__':
     train_set, _ = data.build_set("tfidf", train_file_name)
     test_set, _ = data.build_set("tfidf", test_file_name)
     classifier = rocchio_classifier.RocchioClassifier(train_set)
-    print("tfidf:", '{:.3f}'.format(calc_accuracy1(test_set, classifier)))
+    print("tfidf:", '{:.3f}'.format(calc_accuracy(test_set, classifier)))
+
+    train_set, _ = data.build_set("tfidf", train_file_name)
+    test_set, _ = data.build_set("tfidf", test_file_name)
+    classifier = rocchio_classifier.RocchioClassifier(train_set)
+    print("tfidf with cosine similarity:", '{:.3f}'.format(calc_accuracy_with_cosine(test_set, classifier)))
